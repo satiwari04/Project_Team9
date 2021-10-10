@@ -1,0 +1,879 @@
+---Dashboard---
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Project2
+{
+    public partial class Dashboard : Form
+    {
+        public Dashboard()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Form1 obj = new Form1();
+            obj.Show();
+        }
+
+        private void btnaddcategories_Click(object sender, EventArgs e)
+        {
+            Categories obj_cat = new Categories();
+            obj_cat.Show();
+        }
+
+        private void btncust_Click(object sender, EventArgs e)
+        {
+            Customer obj_cust = new Customer();
+            obj_cust.Show();
+        }
+
+        private void btnaddcust_Click(object sender, EventArgs e)
+        {
+            AdditionalCustomer ob_ac = new AdditionalCustomer();
+            ob_ac.Show();
+        }
+
+        private void btnaddorders_Click(object sender, EventArgs e)
+        {
+            Orders ob_orders = new Orders();
+            ob_orders.Show();
+        }
+
+        private void btnaddoffer_Click(object sender, EventArgs e)
+        {
+            Offers ob_offers = new Offers();
+            ob_offers.Show();
+        }
+    }
+}
+
+
+--Customers---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace Project2
+{
+    public partial class Customer : Form
+    {
+        DataTable dt;
+        DataColumn dc;
+        DataRow dr;
+        DataTable prod;
+        
+        public Customer()
+        {
+            InitializeComponent();
+        }
+
+        private void Customer_Load(object sender, EventArgs e)
+        {
+            prod = GenerateTable();
+            dataGridView1.DataSource = prod;
+        }
+
+        DataTable GenerateTable()
+        {
+            dt = new DataTable("Customer");
+
+            dc = new DataColumn("Customer Id", typeof(int));
+            dt.Columns.Add(dc);
+            dt.PrimaryKey = new DataColumn[] { dc };
+
+            dc = new DataColumn("Customer Name", typeof(string));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Contact Number", typeof(string));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Email ID", typeof(string));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Address", typeof(string));
+            dt.Columns.Add(dc);
+
+            return dt;
+        }
+        private void btnsubmit_Click(object sender, EventArgs e)
+        {
+            string custid, custname, cnctno, email, address;
+            custid = txtcustid.Text;
+            custname = txtcustname.Text;
+            cnctno = txtcnct.Text;
+            email = txtemail.Text;
+            address = txtaddr.Text;
+
+            try
+            {
+                dr = prod.NewRow();
+                dr[0] = int.Parse(custid);
+                dr[1] = custname;
+                dr[2] = long.Parse(cnctno);
+                dr[3] = email;
+                dr[4] = address; 
+
+                prod.Rows.Add(dr);
+            }
+            catch(Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
+            Clear();
+        }
+        private void Clear()
+        {
+            txtcustid.Text = "";
+            txtcustname.Text = "";
+            txtcnct.Text = "";
+            txtemail.Text = "";
+            txtaddr.Text = "";
+        }
+
+        private void txtcustid_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtcustid.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Do not enter non-numeric value");
+                txtcustid.Text = "";
+            }
+        }
+
+        private void txtcnct_TextChanged(object sender, EventArgs e)
+        {
+
+            if (Regex.IsMatch(txtcnct.Text, @"[^0-9]$"))
+            {
+                MessageBox.Show("Do not enter non-numeric value");
+                txtcnct.Text = "";
+            }
+           // if (Regex.IsMatch(txtcnct.Text, @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})(?!\d)$"))
+           if(Regex.IsMatch(txtcnct.Text, @"^[0-9]{10}$"))
+            {
+                MessageBox.Show("Value should not exceed 10  digits");
+               //txtcnct.Text = cnctno;
+            }
+        }
+
+        private void txtemail_TextChanged(object sender, EventArgs e)
+        {
+            // Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+            Regex regex = new Regex(@"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z");
+            Match match = regex.Match(txtemail.Text, 0);
+            if (match.Success)
+            {
+                MessageBox.Show("Invalid Email.");
+                //txtemail.Text = "";
+            }
+
+                //lbl_message.Text = email + " is Valid Email Address";
+           /* else
+            {
+                MessageBox.Show("Invalid Email.");
+                txtemail.Text = "";
+            }*/
+                //lbl_message.Text = email + " is Invalid Email Address";
+
+        }
+    }
+}
+
+/*
+  //const string Pattern = @"^[^@\s]+@[^@\s]+/.[^@\s]+$";
+
+
+    
+
+
+    String Pattern = @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|
+    (([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
+            // bool isValid = regex.IsMatch(txtemail.Text.Trim());
+            bool isValid = Regex.IsMatch(txtemail.Text, Pattern);
+            if (isValid)
+            {
+              //  txtemail.Text = "";
+            }
+            else
+            {
+                MessageBox.Show("Invalid Email.");
+                txtemail.Text = "";
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //const string Pattern = @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$";
+            const string Pattern = @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
+            if (Regex.IsMatch(txtemail.Text, Pattern))
+            {
+                MessageBox.Show("Invalid Value");
+                txtemail.Text = "";
+            }
+     */
+
+--Categories--
+using System;
+using System.Data;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace Project2
+{
+    public partial class Categories : Form
+    {
+        DataTable dt;
+        DataColumn dc;
+        DataRow dr;
+        DataTable prod;
+
+        public Categories()
+        {
+            InitializeComponent();
+        }
+
+        private void Categories_Load(object sender, EventArgs e)
+        {
+            prod = GenerateTable();
+            dataGridView1.DataSource = prod;
+        }
+
+        DataTable GenerateTable()
+        {
+            dt = new DataTable("Categories");
+
+            dc = new DataColumn("Category Id", typeof(int));
+            dt.Columns.Add(dc);
+            dt.PrimaryKey = new DataColumn[] { dc };
+
+            dc = new DataColumn("Category Name", typeof(string));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Category Description", typeof(string));
+            dt.Columns.Add(dc);
+
+            return dt;
+        }
+
+        private void btnsubmit_Click(object sender, EventArgs e)
+        {
+            string catid, catname, catdesc;
+            catid = txtcatid.Text;
+            catname = txtcatname.Text;
+            catdesc = txtcatdesc.Text;
+            try
+            {
+                dr = prod.NewRow();
+                dr[0] = int.Parse(catid);
+                dr[1] = catname;
+                dr[2] = catdesc;
+
+                prod.Rows.Add(dr);
+            }
+            catch(Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
+            Clear();
+        }
+        private void Clear()
+        {
+            txtcatid.Text = "";
+            txtcatname.Text = "";
+            txtcatdesc.Text = "";
+        }
+
+        private void txtcatid_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtcatid.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Do not enter non-numeric value");
+                txtcatid.Text = "";
+            }
+        }
+    }
+}
+
+---offers--
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace Project2
+{
+    public partial class Offers : Form
+    {
+        DataTable dt;
+        DataColumn dc;
+        DataRow dr;
+        DataTable prod;
+
+        //public bool ReadOnly { get; set; }
+        public Offers()
+        {
+            InitializeComponent();
+        }
+
+        private void Offers_Load(object sender, EventArgs e)
+        {
+            prod = GenerateTable();
+            dataGridView1.DataSource = prod;
+        }
+        DataTable GenerateTable()
+        {
+            dt = new DataTable("OFFERS");
+
+            dc = new DataColumn("Offer ID", typeof(int));
+            dt.Columns.Add(dc);
+            dt.PrimaryKey = new DataColumn[] { dc };
+
+            dc = new DataColumn("Discount", typeof(int));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Promo Code", typeof(string));
+            dt.Columns.Add(dc);
+
+            return dt;
+        }
+        private void btnsubmit_Click(object sender, EventArgs e)
+        {
+            string offerid, discount,promocode;
+            offerid = txtofferid.Text;
+            discount = txtdiscount.Text;
+            promocode = txtpromocode.Text;
+            try
+            {
+                dr = prod.NewRow();
+                dr[0] = int.Parse(offerid);
+                dr[1] = int.Parse(discount);
+                dr[2] = promocode;
+
+                prod.Rows.Add(dr);
+            }
+            catch (Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
+            Clear();
+        }
+        private void Clear()
+        {
+            txtofferid.Text = "";
+            txtdiscount.Text = "";
+            txtpromocode.Text = "";
+        }
+
+        private void txtofferid_TextChanged(object sender, EventArgs e)
+        {
+            String num = "1234567910";
+            int discount = 5;
+            if (Regex.IsMatch(txtofferid.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Do not enter non-numeric value");
+                txtofferid.Text = "";
+            }
+            if(txtofferid.Equals(num))
+            {
+                txtdiscount.Enabled = true;
+                txtdiscount.Text = discount.ToString();
+                //discount = int.Parse(txtdiscount.Text);
+            }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chckboxpc.Checked)
+            {
+                txtpromocode.Enabled = true;
+              //  txtpromocode.BackColorChanged += "white";
+            }
+            else
+            {
+                txtpromocode.Enabled = false;
+                txtpromocode.Text = "";
+            }
+        }
+    }
+}
+
+
+---Orders--
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace Project2
+{
+    public partial class Orders : Form
+    {
+        DataTable dt;
+        DataColumn dc;
+        DataRow dr;
+        DataTable prod;
+        public Orders()
+        {
+            InitializeComponent();
+        }
+
+        private void Orders_Load(object sender, EventArgs e)
+        {
+            prod = GenerateTable();
+            dataGridView1.DataSource=prod;
+        }
+
+        DataTable GenerateTable()
+        {
+            dt = new DataTable("Orders");
+            
+            dc = new DataColumn("Order Id", typeof(int));
+            dt.Columns.Add(dc);
+            dt.PrimaryKey = new DataColumn[] { dc };
+
+            dc = new DataColumn("Product Id", typeof(int));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Quantity", typeof(int));
+            dt.Columns.Add(dc);
+
+            return dt;
+        }
+        private void btnsubmit_Click(object sender, EventArgs e)
+        {
+            string orderid, productid, qty;
+            orderid = txtorderid.Text;
+            productid = txtprodid.Text;
+            qty = txtqty.Text;
+
+            try
+            {
+                dr = prod.NewRow();
+                dr[0] = int.Parse(orderid);
+                dr[1] = int.Parse(productid);
+                dr[2] = int.Parse(qty);
+
+                prod.Rows.Add(dr);
+            }
+            catch (Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
+            Clear();
+        }
+
+        private void Clear()
+        {
+            txtorderid.Text = "";
+            txtprodid.Text = "";
+            txtqty.Text = "";
+        }
+
+        private void txtorderid_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtorderid.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Do not enter non-numeric value");
+                txtorderid.Text = "";
+            }
+        }
+
+        private void txtprodid_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtprodid.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Do not enter non-numeric value");
+                txtprodid.Text = "";
+            }
+        }
+
+        private void txtqty_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtqty.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Do not enter non-numeric value");
+                txtqty.Text = "";
+            }
+        }
+    }
+}
+
+
+--Additional Customer--
+
+using System;
+using System.Data;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace Project2
+{
+    public partial class AdditionalCustomer : Form
+    {
+        DataTable dt;
+        DataColumn dc;
+        DataRow dr;
+        DataTable prod;
+
+        string custid, dob, payment, offercashback;
+        
+        public AdditionalCustomer()
+        {
+            InitializeComponent();
+        }
+
+        private void AdditionalCustomer_Load(object sender, EventArgs e)
+        {
+            prod = GenerateTable();
+            dataGridView1.DataSource = prod;
+        }
+
+        DataTable GenerateTable()
+        {
+            dt = new DataTable("Additional Customers");
+
+            dc = new DataColumn("Customer Id", typeof(int));
+            dt.Columns.Add(dc);
+            dt.PrimaryKey = new DataColumn[] { dc };
+
+            dc = new DataColumn("Date of Birth", typeof(string));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Payment", typeof(string));
+            dt.Columns.Add(dc);
+
+            dc = new DataColumn("Cashback Offer", typeof(string));
+            dt.Columns.Add(dc);
+
+            return dt;
+        }
+
+
+        private void btnsubmit_Click(object sender, EventArgs e)
+        {
+            //string custid, dob, payment, offercashback;
+            txtoffer.Enabled = false;
+            custid = txtcustid.Text;
+            dob = dateTimePicker1.Text;
+            payment = comboBox1.Text;
+            offercashback = txtoffer.Text;
+
+           
+            try
+            {
+                dr = prod.NewRow();
+                dr[0] = int.Parse(custid);
+                dr[1] = dob;
+                dr[2] = payment;
+                dr[3] = offercashback;
+
+                prod.Rows.Add(dr);
+            }
+            catch (Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
+            Clear();
+        }
+
+        /*private void txtoffer_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtoffer.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Enter a numeric value");
+                txtoffer.Text = "";
+            }
+        }*/
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selectedIndex = comboBox1.SelectedIndex;
+            Object selectedItem = comboBox1.SelectedItem;
+            MessageBox.Show("OFFERS VALID\n1.ICICI BANK(Credit /Debit) receives 10% of Discount\n2.HDFC BANK(Credit/Debit) receives 15% " +
+                "of Discount\n3.AXIS BANK(Credit/Debit) receives 10% of Disocunt");
+           // MessageBox.Show("Selected Index:" + selectedIndex + "\n Selected Item:" + selectedItem);
+
+            if(selectedIndex == 0)
+            {
+                MessageBox.Show("You have selected:" + selectedItem+"\n You Receive 5% of Discount on your Order");
+            }
+            else if (selectedIndex == 1)
+            {
+                MessageBox.Show("You have selected:" + selectedItem + "\n You Receive 15% of Discount on your Order");
+            }
+            else if (selectedIndex == 2)
+            {
+                MessageBox.Show("You have selected:" + selectedItem + "\n You Receive 10% of Discount on your Order");
+            }
+            else if (selectedIndex == 3)
+            {
+                MessageBox.Show("You have selected:" + selectedItem + "\n You Receive 10% of Discount on your Order");
+            }
+            else if (selectedIndex == 4)
+            {
+                MessageBox.Show("You have selected:" + selectedItem + "\n You Receive 5% of Discount on your Order");
+            }
+            else if (selectedIndex == 5)
+            {
+                MessageBox.Show("You have selected:" + selectedItem + "\n You Receive 10% of Discount on your Order");
+            }
+        }
+
+        private void txtoffer_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtcustid.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Enter a numeric value");
+                txtcustid.Text = "";
+            }
+        }
+
+        private void Clear()
+        {
+            txtcustid.Text = "";
+            dateTimePicker1.Text = "";
+            comboBox1.Text = "";
+            txtoffer.Text = "";
+        }
+
+        private void txtcustid_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(txtcustid.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Enter a numeric value");
+                txtcustid.Text = "";
+            }
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+
+            string dob = dateTimePicker1.Text;
+            try
+            {
+                DateTime mydate = DateTime.Parse(dob);
+                if (mydate > DateTime.Today)
+                {
+                    MessageBox.Show("Enter a Valid Date");
+                    dateTimePicker1.Text = "";
+                }
+            }
+            catch(Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
+            
+        }
+
+    }
+}
+
+
+
+/*//if(dob)
+            System.DateTime compareDt=new System.DateTime(System.DateTime.Today.Year,sender);
+            int compareValue;
+            try
+            {
+                compareValue = compareDt.CompareTo(DateTime.Today);
+            }
+            catch (Exception e1)
+            {
+                Console.WriteLine("Value not Datetime");
+                return;
+            }
+            if (compareValue > 0)
+                MessageBox.Show("Hi");
+            //System.Console.WriteLine("{0:d} is in the past.", compareDt);
+            else if (compareValue < 0)
+                MessageBox.Show("Hlw");
+            //System.Console.WriteLine("{0:d} is today!", compareDt);
+            else // compareValue > 0
+                MessageBox.Show("Hello");
+                //System.Console.WriteLine("{0:d} has not come yet.", compareDt);*/
